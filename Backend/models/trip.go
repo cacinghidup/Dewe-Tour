@@ -1,12 +1,9 @@
 package models
 
-// import "time"
-
 type Trip struct {
-	ID      int    `json:"id"`
-	Title   string `json:"title" gorm:"varchar(100)"`
-	Country string `json:"country" gorm:"varchar(100)"`
-	// Countries      CountriesResponse
+	ID             int    `json:"id"`
+	Title          string `json:"title" gorm:"varchar(100)"`
+	Country        string `json:"country" gorm:"varchar(100)"`
 	Accomodation   string `json:"accomodation" gorm:"varchar(100)"`
 	Transportation string `json:"transportation" gorm:"varchar(100)"`
 	Eat            string `json:"eat" gorm:"varchar(100)"`
@@ -18,24 +15,3 @@ type Trip struct {
 	Description    string `json:"description" gorm:"varchar(255)"`
 	Image          string `json:"image" gorm:"varchar(100)"`
 }
-
-// type TripResponseRelation struct {
-// 	ID      int    `json:"id"`
-// 	Title   string `json:"title"`
-// 	Country string `json:"country"`
-// 	// Countries      CountriesResponse
-// 	Accomodation   string `json:"accomodation"`
-// 	Transportation string `json:"transportation"`
-// 	Eat            string `json:"eat"`
-// 	Day            int32  `json:"day"`
-// 	Night          int32  `json:"night"`
-// 	DateTrip       string `json:"dateTrip"`
-// 	Price          int64  `json:"price"`
-// 	Quota          int32  `json:"quota"`
-// 	Description    string `json:"description"`
-// 	Image          string `json:"image"`
-// }
-
-// func (TripResponseRelation) TableName() string {
-// 	return "trips"
-// }

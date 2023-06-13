@@ -8,7 +8,7 @@ import { API, setAuthToken } from "../config/api";
 import jwtDecode from "jwt-decode";
 
 
-function DetailTourism({toParent, statusUser}) {
+function DetailTourism({ statusUser}) {
   const [showModalAlert, setshowModalAlert] = useState(false)
   const hidden = (data) => setshowModalAlert(data)
 
@@ -17,15 +17,15 @@ function DetailTourism({toParent, statusUser}) {
   const { data: tour } = useQuery(['tourDetailsCache'], async () => {
     const response = await API.get('/trip/' + params.id);
     return response.data.data;
+  }, {
+    refetchOnWindowFocus: true,
   });
-
-  const pathFile = "http://localhost:5005/"
   
+  const [price, setPrice] = useState(tour?.price)
   const toIdr = tour?.price.toLocaleString()
   
   const [pax, setPax] = useState(1)
-  const [price, setPrice] = useState(tour?.price)
-
+  
   const idRole = localStorage.getItem('token')
   
   const [form, setForm] = useState({
@@ -36,6 +36,7 @@ function DetailTourism({toParent, statusUser}) {
     attachment: "bca.jpg",
     user_id: jwtDecode(idRole).id,
   })
+
   
   useEffect (() => {  
     setPrice(() => tour?.price * pax)// eslint-disable-next-line
@@ -79,15 +80,15 @@ function DetailTourism({toParent, statusUser}) {
       };
 
       // Insert data for login process, you can also make this without any configuration, because axios would automatically handling it.
-      const response = await API.post('/transaction', form, config );
+      const response = await API.post('/booking', form, config );
 
-      console.log("Berhasil Update Payment", response)
+      console.log("Berhasil Booking", response)
 
       // toParent({Prove: false})
       
     }
     catch(error){
-      console.log("Gagal Input Transaksi", error)
+      console.log("Gagal Input Booking", error)
     }
   })
 
@@ -110,23 +111,9 @@ function DetailTourism({toParent, statusUser}) {
       <Carousel interval={null}>
         <Carousel.Item>
           <img
-            className="CarouselTour"
-            src={pathFile + (tour?.image)}
+            className="CarouselTour w-100"
+            src={(tour?.image)}
             alt="First"
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            className="CarouselTour"
-            src={tour?.image}
-            alt="Second"
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            className="CarouselTour"
-            src={tour?.image}
-            alt="Third"
           />
         </Carousel.Item>
       </Carousel>

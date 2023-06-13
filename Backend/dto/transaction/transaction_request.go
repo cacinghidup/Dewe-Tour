@@ -1,6 +1,7 @@
 package dtotransaction
 
 type TransactionRequest struct {
+	ID         int    `json:"id" form:"id"`
 	CounterQty int32  `json:"counter_qty" form:"counter_qty" validate:"required"`
 	Total      int64  `json:"total" form:"total" validate:"required"`
 	Status     string `json:"status" form:"status" validate:"required"`
@@ -10,5 +11,6 @@ type TransactionRequest struct {
 }
 
 type UpdateTransaction struct {
+	ID     int    `json:"id" form:"id"`
 	Status string `json:"status" form:"status"`
 }

@@ -79,8 +79,7 @@ function App() {
         type: 'USER_SUCCESS',
         payload,
       });
-
-      console.log("INI di APP.js", payload)
+      // console.log("INI di APP.js", payload)
       setIsLoading(false)
     } catch (error) {
       console.log("check user failed : ", error);
@@ -107,7 +106,7 @@ function App() {
 
               {/* URL ASLI */}
               <Route exact path='/' element={<HomePage userAdmin={userAdmin}/>}/>
-              <Route exact path='/detailTour/:id' element={<DetailTourism statusUser={(userLogin)}/>}/>
+              <Route exact path='/detailTour/:id' element={<DetailTourism statusUser={(userLogin)} isLoading={isLoading}/>}/>
               {/* <Route element={<PrivateRouteLogin/>}> */}
                 <Route element={<PrivateRouteUser/>}>
                   <Route exact path='/payment/:id' element={<Payment payUp={payUp}/>}/>

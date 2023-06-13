@@ -9,10 +9,15 @@ import (
 type TransactionRepository interface {
 	FindTransaction() ([]models.Transaction, error)
 	CreateTransaction(Transaction models.Transaction) (models.Transaction, error)
-	UpdateTransaction(Transaction models.Transaction) (models.Transaction, error)
+	UpdateTransaction(status string, ID int) (models.Transaction, error)
 	GetTransactionTrip(ID int) (models.Trip, error)
 	GetTransactionUser(ID int) (models.User, error)
 	GetTransaction(ID int) (models.Transaction, error)
+
+	FindBooking() ([]models.Booking, error)
+	CreateBooking(Booking models.Booking) (models.Booking, error)
+	DeleteBooking(Booking models.Booking) (models.Booking, error)
+	GetBooking(ID int) (models.Booking, error)
 }
 
 type repositoriesTransaction struct {
@@ -50,10 +55,23 @@ func (r *repositoriesTransaction) GetTransactionUser(ID int) (models.User, error
 	return User, err
 }
 
-func (r *repositoriesTransaction) UpdateTransaction(Transaction models.Transaction) (models.Transaction, error) {
-	err := r.db.Preload("Trip").Save(&Transaction).Error
+func (r *repositoriesTransaction) UpdateTransaction(status string, ID int) (models.Transaction, error) {
+	var transaction models.Transaction
+	r.db.Preload("Trip").Preload("User").First(&transaction, ID)
 
-	return Transaction, err
+	// fmt.Println("Ini di repo transaksi", status, transaction.Status)
+
+	if status != transaction.Status && status == "Success" {
+		var trip models.Trip
+		r.db.First(&trip, transaction.Trip.ID)
+		trip.Quota = trip.Quota - transaction.CounterQty
+		r.db.Save(&trip)
+	}
+
+	transaction.Status = status
+	err := r.db.Save(&transaction).Error
+
+	return transaction, err
 }
 
 func (r *repositoriesTransaction) GetTransaction(ID int) (models.Transaction, error) {
@@ -61,4 +79,31 @@ func (r *repositoriesTransaction) GetTransaction(ID int) (models.Transaction, er
 	err := r.db.Preload("User").Preload("Trip").First(&Transaction, ID).Error
 
 	return Transaction, err
+}
+
+// ---------------------------------------------------------------- //
+func (r *repositoriesTransaction) CreateBooking(Booking models.Booking) (models.Booking, error) {
+	err := r.db.Create(&Booking).Error
+
+	return Booking, err
+}
+
+func (r *repositoriesTransaction) DeleteBooking(Booking models.Booking) (models.Booking, error) {
+	err := r.db.Delete(&Booking).Error
+
+	return Booking, err
+}
+
+func (r *repositoriesTransaction) FindBooking() ([]models.Booking, error) {
+	var Booking []models.Booking
+	err := r.db.Preload("User").Preload("Trip").Find(&Booking).Error
+
+	return Booking, err
+}
+
+func (r *repositoriesTransaction) GetBooking(ID int) (models.Booking, error) {
+	var Booking models.Booking
+	err := r.db.First(&Booking, ID).Error
+
+	return Booking, err
 }

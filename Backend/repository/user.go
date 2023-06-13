@@ -28,7 +28,7 @@ func RepositoryUser(db *gorm.DB) *repositories {
 // method query
 func (r *repositories) FindUsers() ([]models.User, error) {
 	var Users []models.User
-	err := r.db.Preload("Transaction.Trip").Preload("Transaction.User").Find(&Users).Error
+	err := r.db.Preload("Transaction.Trip").Preload("Transaction.User").Preload("Booking.Trip").Preload("Booking.User").Find(&Users).Error
 	// err := r.db.Raw("SELECT * FROM users").Scan(&Users).Error
 
 	return Users, err
@@ -36,7 +36,7 @@ func (r *repositories) FindUsers() ([]models.User, error) {
 
 func (r *repositories) GetUser(ID int) (models.User, error) {
 	var User models.User
-	err := r.db.Preload("Transaction.Trip").Preload("Transaction.User").First(&User, ID).Error
+	err := r.db.Preload("Transaction.Trip").Preload("Transaction.User").Preload("Booking.Trip").Preload("Booking.User").First(&User, ID).Error
 	// err := r.db.Raw("SELECT * FROM users WHERE id=?", ID).Scan(&User).Error
 
 	return User, err

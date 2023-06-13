@@ -13,6 +13,7 @@ func RunMigration() {
 		// &models.Countries{},
 		&models.Trip{},
 		&models.Transaction{},
+		&models.Booking{},
 	)
 
 	if err != nil {

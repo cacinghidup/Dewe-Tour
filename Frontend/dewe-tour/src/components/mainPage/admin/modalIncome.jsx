@@ -1,4 +1,8 @@
-import { Modal } from "react-bootstrap";
+import { Modal, Table, Image } from "react-bootstrap";
+import {API} from "../../config/api";
+import iconPayment from '../../payment/IconPaymentCard.png';
+import { useQuery } from "@tanstack/react-query";
+
 
 
 function ModalIncome({show, handleClose, params}) {
@@ -6,11 +10,16 @@ function ModalIncome({show, handleClose, params}) {
     const { data: order } = useQuery(['detailIncomeCache'], async () => {
         const response = await API.get('/transaction/' + params);
         return response.data.data;
+    },{
+        refetchInterval: 500,
+        refetchIntervalInBackground: true,
     });
+
+    // console.log("Ini Ibnu", params)
 
     return (
         <>
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} fullscreen={true}>
                 <Modal.Header closeButton onClick={handleClose}>
                     <Modal.Title>Income</Modal.Title>
                 </Modal.Header>
@@ -78,12 +87,12 @@ function ModalIncome({show, handleClose, params}) {
                             </thead>
                             <tbody>
                                 <tr>
-                                <td className="text-center"> {user?.user_id} </td>
-                                <td> {user?.name} </td>
+                                <td className="text-center"> {order?.User?.user_id} </td>
+                                <td> {order?.User?.name} </td>
                                 <td></td>
-                                <td> {user?.phone} </td>
+                                <td> {order?.User?.phone} </td>
                                 <td>Qty : </td>
-                                <td> {user?.Transaction[(user.Transaction.length - 1)]?.counter_qty} </td>
+                                <td> {order?.counter_qty} </td>
                                 </tr>
                                 <tr>
                                 <td></td>
@@ -91,7 +100,7 @@ function ModalIncome({show, handleClose, params}) {
                                 <td></td>
                                 <td></td>
                                 <td> Total : </td>
-                                <td> IDR {user?.Transaction[(user.Transaction.length - 1)]?.total}</td>
+                                <td> IDR {order?.total}</td>
                                 </tr>
                             </tbody>
                         </Table>

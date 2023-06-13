@@ -20,7 +20,7 @@ function UserProfile({prove}) {
 
     const data1 =  userProfile?.Transaction.filter((Transaction) => {
         // eslint-disable-next-line
-        return Transaction.status == 'Waiting Approved'
+        return Transaction.status == 'Success'
     })
 
     // console.log(userProfile, data1)

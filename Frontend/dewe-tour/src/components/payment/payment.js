@@ -2,11 +2,11 @@ import Image from "react-bootstrap/esm/Image";
 import iconPayment from './IconPaymentCard.png';
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Table from 'react-bootstrap/Table';
-import { useParams } from "react-router-dom";
+import { redirect, useParams } from "react-router-dom";
 import { API, setAuthToken } from "../config/api";
-import ButtonPay from "./buttonPay";
+import {ButtonPay} from "./buttonPay";
 import ModalPayment from "./modalPayment";
 import jwtDecode from "jwt-decode";
 
@@ -18,72 +18,100 @@ function Payment() {
     const [prove, setProve] = useState(false)
     const proved = (data) => setProve(data)
 
-    const[showMod, setshowMod] = useState(false)
-    // const[hideMod, sethideMod] = useState(false)
-    const hidden = (data1) => setshowMod(data1) 
-
     setAuthToken(localStorage.token);
 
     const { data: payment } = useQuery(['tourDetailCache'], async () => {
         const response = await API.get('/trip/' + params.id);
         return response.data.data;
     });
-
-
+    
     const { data: user } = useQuery(['userPaymentCache'], async () => {
         const response = await API.get('/user/' + id.id);
         return response.data.data;
     }, {
         refetchInterval: 1000,
         refetchIntervalInBackground: true,
-    }
-    );
+    });
 
-    const [form, setForm] = useState({
-        status: '',
-    })
-
-    const updateForm = (data) => setForm(data)
-
-
-    const handleSubmit = useMutation(async (e) => {
-        try{
-        e.preventDefault()
-
-        setAuthToken(localStorage.token);
-
-        // console.log(setAuthToken)
-
-        // const formToJSON = JSON.stringify(form)
-        
-        // Configuration
-        const config = {
-            headers: {
-            'Content-type': 'application/json',
-            },
+    useEffect(() => {
+        //change this to the script source you want to load, for example this is snap.js sandbox env
+        const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+        //change this according to your client-key
+        const myMidtransClientKey = process.env.REACT_APP_MIDTRANS_CLIENT_KEY;
+    
+        let scriptTag = document.createElement("script");
+        scriptTag.src = midtransScriptUrl;
+        // optional if you want to set script attribute
+        // for example snap.js have data-client-key attribute
+        scriptTag.setAttribute("data-client-key", myMidtransClientKey);
+    
+        document.body.appendChild(scriptTag);
+        return () => {
+          document.body.removeChild(scriptTag);
         };
-
-        // Insert data for login process, you can also make this without any configuration, because axios would automatically handling it.
-        const response = await API.patch('/transaction/' + user?.Transaction[(user.Transaction.length - 1)].id, form, config );
-
-        console.log("Berhasil Update Status", response)
-
-        fetch('/user/' + id)
-
-        }
-        catch(error){
-        console.log("Gagal Input Status", error)
-        }
-    })
+    }, []);
 
     function ShowModal(e) {
-        setshowMod(true)
-        updateForm({status: 'Waiting Approved'})
-        handleSubmit.mutate(e)
+        handleBuy.mutate(e)
         proved(true)
     }
 
-    // console.log(user?.Transaction[(user.Transaction.length - 1)])
+    const handleBuy = useMutation(async (e) => {
+        try {
+          e.preventDefault();
+
+          setAuthToken(localStorage.token);
+    
+          const config = {
+            headers: {
+              'Content-type': 'application/json',
+            },
+          };
+    
+          const data = {
+            id: user?.Booking[(user.Booking.length - 1)].id,
+            counter_qty : user?.Booking[(user.Booking.length - 1)].counter_qty,
+            total : user?.Booking[(user.Booking.length - 1)].total,
+            status : user?.Booking[(user.Booking.length - 1)].status,
+            attachment : user?.Booking[(user.Booking.length - 1)].attachment,
+            trip_id : user?.Booking[(user.Booking.length - 1)].trip_id,
+            user_id : user?.user_id        
+        };
+    
+          const body = JSON.stringify(data);
+
+          const response = await API.post('/transaction', body, config);
+          console.log("transaction success :", response)
+    
+          const token = response.data.data.token;
+          window.snap.pay(token, {
+            onSuccess: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onPending: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onError: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onClose: function () {
+              /* You may add your own implementation here */
+              alert("you closed the popup without finishing the payment");
+            },
+          });
+
+          await API.delete('/booking/' + user?.Booking[(user.Booking.length - 1)].id)
+
+        } catch (error) {
+          console.log("transaction failed : ", error);
+        }
+    });
 
     return (
         <>
@@ -112,7 +140,7 @@ function Payment() {
                                     <p>  {payment?.country} </p>
                                 </div>
                                 <div>
-                                    <p className="btn btn-outline-danger mt-4" style={{cursor:'default'}}> {(user?.Transaction[(user.Transaction.length - 1)]?.status)} </p>
+                                    <p className="btn btn-outline-danger mt-4" style={{cursor:'default'}}> {(user?.Booking[(user.Booking.length - 1)]?.status)} </p>
                                 </div>
                             </div>
                             <div className="InfoTrip">
@@ -154,7 +182,7 @@ function Payment() {
                                 <td></td>
                                 <td> {user?.phone} </td>
                                 <td>Qty : </td>
-                                <td> {user?.Transaction[(user.Transaction.length - 1)]?.counter_qty} </td>
+                                <td> {user?.Booking[(user.Booking.length - 1)]?.counter_qty} </td>
                                 </tr>
                                 <tr>
                                 <td></td>
@@ -162,7 +190,7 @@ function Payment() {
                                 <td></td>
                                 <td></td>
                                 <td> Total : </td>
-                                <td> IDR {user?.Transaction[(user.Transaction.length - 1)]?.total}</td>
+                                <td> IDR {user?.Booking[(user.Booking.length - 1)]?.total}</td>
                                 </tr>
                             </tbody>
                         </Table>
@@ -171,7 +199,7 @@ function Payment() {
                 <div onClick={ShowModal}>
                     {prove ? (<></>) : (<ButtonPay/>)}
                 </div>
-                <ModalPayment show={showMod} hideMod={hidden} param={(params.id)} prove={proved}/>
+                {/* <ModalPayment show={showMod} hideMod={hidden} param={(params.id)} prove={proved}/> */}
             </div>
         </>
     )

@@ -185,9 +185,10 @@ function AddTrip() {
                         <Form.Label>Description</Form.Label>
                         <Form.Control 
                             id='description' 
-                            type="text"
+                            as="textarea"
                             onChange={handleChange}
                             value={form.description}
+                            style={{ height: '100px', resize: 'none' }}
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">

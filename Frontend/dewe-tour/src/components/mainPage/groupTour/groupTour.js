@@ -11,8 +11,6 @@ function GroupTour() {
         return response.data.data;
     });
     
-    const pathFile = "http://localhost:5005/"
-
     return (
         <div className='GridGroupTour'>
             {tour?.map((variant) => (
@@ -20,10 +18,10 @@ function GroupTour() {
                 <Card className='GroupCard p-2 my-4'>
                     <div style={{position:'relative'}}>
                         <div>
-                            <Card.Img className='GroupCardImage' variant="top" src={pathFile + (variant.image)}/>
+                            <Card.Img style={{height:'250px', width:'100%'}} className='GroupCardImage' variant="top" src={(variant.image)}/>
                         </div>
                         <div>
-                            <p style={{position:'absolute', top:'30px', right:'0', backgroundColor:'white', padding:'5px', borderRadius:'5px 0px 0px 5px'}}> {variant.quota} </p>
+                            <p style={{position:'absolute', top:'30px', right:'0', backgroundColor:'white', padding:'5px', borderRadius:'5px 0px 0px 5px'}}> Available Tour : {variant.quota} </p>
                         </div>
                     </div>
                     <Card.Body className='row d-flex justify-content-start m-0 p-0' style={{textAlign:'center'}}>

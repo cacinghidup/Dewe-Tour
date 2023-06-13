@@ -52,15 +52,13 @@ func (h *handlerTrip) GetTrip(c echo.Context) error {
 }
 
 func (h *handlerTrip) CreateTrip(c echo.Context) error {
-	// CountriesID, _ := strconv.Atoi(c.FormValue("countries_id"))
+
 	Day, _ := strconv.Atoi(c.FormValue("day"))
 	Night, _ := strconv.Atoi(c.FormValue("night"))
 	Price, _ := strconv.Atoi(c.FormValue("price"))
 	Quota, _ := strconv.Atoi(c.FormValue("quota"))
 
 	UploadImage := c.Get("dataFile").(string)
-
-	// TripCountry, _ := h.TripRepository.GetCountryTrip(CountriesID)
 
 	request := tripdto.TripResquest{
 		Title:          c.FormValue("title"),

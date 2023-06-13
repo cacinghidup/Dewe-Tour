@@ -1,7 +1,7 @@
 import { Modal } from "react-bootstrap"
 import { Link } from "react-router-dom"
 
-function ModalPayment({show, hideMod, param, prove}) {
+function ModalPayment({show, hideMod, param}) {
 
     function modalPayment() {
         hideMod(false)

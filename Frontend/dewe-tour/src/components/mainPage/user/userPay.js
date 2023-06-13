@@ -4,22 +4,102 @@ import { API } from "../../config/api";
 import { Image } from 'react-bootstrap';
 import iconPayment from '../../payment/IconPaymentCard.png';
 import {Table} from "react-bootstrap";
-import ButtonPay from "../../payment/buttonPay";
-
+import {ButtonPay, ButtonDeleteBooking } from "../../payment/buttonPay";
+import { setAuthToken } from "../../config/api";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { redirect } from "react-router-dom";
 function UserPay() {
 
     const idRole = localStorage.getItem('token')
     const id = jwtDecode(idRole)
+
+    setAuthToken(localStorage.token);
 
     const { data: userProfile } = useQuery(['userProfileCache'], async () => {
         const response = await API.get('/user/' + id.id);
         return response.data.data;
     });
 
-    const data1 =  userProfile?.Transaction.filter((Transaction) => {
+    const data1 =  userProfile?.Booking.filter((Booking) => {
         // eslint-disable-next-line
-        return Transaction.status == 'Waiting Payment'
+        return Booking.status == 'Waiting Payment'
     })
+
+    useEffect(() => {
+        //change this to the script source you want to load, for example this is snap.js sandbox env
+        const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+        //change this according to your client-key
+        const myMidtransClientKey = process.env.REACT_APP_MIDTRANS_CLIENT_KEY;
+    
+        let scriptTag = document.createElement("script");
+        scriptTag.src = midtransScriptUrl;
+        // optional if you want to set script attribute
+        // for example snap.js have data-client-key attribute
+        scriptTag.setAttribute("data-client-key", myMidtransClientKey);
+    
+        document.body.appendChild(scriptTag);
+        return () => {
+          document.body.removeChild(scriptTag);
+        };
+    }, []);
+
+    const handleBuy = useMutation(async (e) => {
+        try {
+          e.preventDefault();
+
+          setAuthToken(localStorage.token);
+    
+          const config = {
+            headers: {
+              'Content-type': 'application/json',
+            },
+          };
+    
+          const data = {
+            id: userProfile?.Booking[(userProfile.Booking.length - 1)].id,
+            counter_qty : userProfile?.Booking[(userProfile.Booking.length - 1)].counter_qty,
+            total : userProfile?.Booking[(userProfile.Booking.length - 1)].total,
+            status : userProfile?.Booking[(userProfile.Booking.length - 1)].status,
+            attachment : userProfile?.Booking[(userProfile.Booking.length - 1)].attachment,
+            trip_id : userProfile?.Booking[(userProfile.Booking.length - 1)].trip_id,
+            user_id : userProfile?.user_id        
+        };
+    
+          const body = JSON.stringify(data);
+
+          const response = await API.post('/transaction', body, config);
+          console.log("transaction success :", response)
+    
+          const token = response.data.data.token;
+          window.snap.pay(token, {
+            onSuccess: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onPending: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onError: function (result) {
+              /* You may add your own implementation here */
+              console.log(result);
+              redirect("/userProfile");
+            },
+            onClose: function () {
+              /* You may add your own implementation here */
+              alert("you closed the popup without finishing the payment");
+            },
+          });
+
+          await API.delete('/booking/' + userProfile?.Booking[(userProfile.Booking.length - 1)].id)
+
+        } catch (error) {
+          console.log("transaction failed : ", error);
+        }
+    });
 
     return (
         <div className="BgPersonalInfo p-5">
@@ -117,12 +197,12 @@ function UserPay() {
                         </Table>
                     </div>
                 </div>
-                {/* <Link style={{textDecoration:'none', cursor:'pointer'}} to={`/paymentSuccess/${params.id}`}> */}
+                <div>
+                    <ButtonDeleteBooking/>
+                </div>
                 <div>
                     <ButtonPay/>
                 </div>
-                {/* </Link> */}
-                {/* <ModalPayment show={showMod} hideMod={hidden} param={(params.id)} prove={proved}/> */}
             </div>
             ))}
                 </div>

@@ -8,5 +8,13 @@ function ButtonPay() {
         </div>
     )
 }
+function ButtonDeleteBooking() {
 
-export default ButtonPay
+    return (
+        <div className="d-flex justify-content-end my-5">
+            <Button variant="danger" size="lg" type="submit" > Delete Booking </Button>
+        </div>
+    )
+}
+
+export {ButtonPay, ButtonDeleteBooking}
