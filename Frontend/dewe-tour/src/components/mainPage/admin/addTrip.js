@@ -21,6 +21,13 @@ function AddTrip() {
         return response.data.record;
     });
 
+    // const { data : province, isLoading } = useQuery(['province'], async () => {
+    //     const response = await axios.get('http://dev.farizdotid.com/api/daerahindonesia/provinsi');
+    //     return response.data.provinsi;
+    // }, {
+    //     refetchOnWindowFocus: true
+    // })
+
     const [form, setForm] = useState({
         title: '',
         country: '',

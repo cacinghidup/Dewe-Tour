@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -98,7 +99,7 @@ func (h *handlerTransaction) CreateTransaction(c echo.Context) error {
 
 	// 1. Initiate Snap client
 	var s = snap.Client{}
-	s.New("SB-Mid-server-oJV_KaHcxWG50Oz_2Hwwp4oR", midtrans.Sandbox)
+	s.New(os.Getenv("SERVER_KEY"), midtrans.Sandbox)
 	// Use to midtrans.Production if you want Production Environment (accept real transaction).
 
 	// 2. Initiate Snap request param
@@ -234,8 +235,8 @@ func SendMail(status string, transaction models.Transaction) {
 		var CONFIG_SMTP_HOST = "smtp.gmail.com"
 		var CONFIG_SMTP_PORT = 587
 		var CONFIG_SENDER_NAME = "Dewe_Tour <demo.dumbways@gmail.com>"
-		var CONFIG_AUTH_EMAIL = "yogaaneh1@gmail.com"
-		var CONFIG_AUTH_PASSWORD = "gsewligowbgudhpz"
+		var CONFIG_AUTH_EMAIL = os.Getenv("AUTH_EMAIL")
+		var CONFIG_AUTH_PASSWORD = os.Getenv("AUTH_PASSWORD")
 
 		var productName = transaction.Trip.Title
 		var price = strconv.Itoa(int(transaction.Total))

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/cloudinary/cloudinary-go"
 	"github.com/cloudinary/cloudinary-go/api/uploader"
@@ -39,9 +40,9 @@ func UploadFile(next echo.HandlerFunc) echo.HandlerFunc {
 		// 	return c.JSON(http.StatusInternalServerError, err)
 		// }
 
-		var CLOUD_NAME = "ddy77nv8y"
-		var API_KEY = "671967728528348"
-		var API_SECRET = "INnLYq63mZDO30dzfofpouBPS0M"
+		var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+		var API_KEY = os.Getenv("API_KEY")
+		var API_SECRET = os.Getenv("API_SECRET")
 
 		// Add your Cloudinary credentials ...
 		cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)

@@ -117,19 +117,6 @@ function DetailTourism({ statusUser}) {
           />
         </Carousel.Item>
       </Carousel>
-      {/* <Container>
-        <Row className="mt-3">
-          <Col>
-            <Image className="shadow-lg w-100 h-100" src={tour?.image} thumbnail/>
-          </Col>
-          <Col>
-            <Image className="shadow-lg w-100 h-100" src={tour?.image} thumbnail/>
-          </Col>
-          <Col>
-            <Image className="shadow-lg w-100 h-100" src={tour?.image} thumbnail/>
-          </Col>
-        </Row>
-      </Container> */}
       <div className="InnerDetail pt-5">
         <h5> Informartion Trip </h5>
         <div className="mt-4 d-flex col justify-content-around">

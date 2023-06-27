@@ -4,14 +4,17 @@ import (
 	"dumbmerch/database"
 	"dumbmerch/pkg/mysql"
 	"dumbmerch/routes"
-	"fmt"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	e := echo.New()
+
+	godotenv.Load()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -21,11 +24,13 @@ func main() {
 
 	e.Static("upload/", "upload")
 
+	var PORT = os.Getenv("PORT")
+
 	mysql.DatabaseConnection()
 	database.RunMigration()
 
 	routes.RouteInit(e.Group("/api/v1"))
 
-	fmt.Println("Running on port 5005")
-	e.Logger.Fatal(e.Start("localhost:5005"))
+	// fmt.Println("Running on port 5005")
+	e.Logger.Fatal(e.Start(":" + PORT))
 }

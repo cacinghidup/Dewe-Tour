@@ -21,6 +21,7 @@ import UserPay from './components/mainPage/user/userPay';
 
 function App() {
   window.scrollTo(0,0)
+
   const [isLoading, setIsLoading] = useState(true)
   
   const [payDone, setpayDone] = useState({Pay: false})
@@ -89,7 +90,6 @@ function App() {
       setIsLoading(false)
     }
   };
-
 
   return (
     <>
